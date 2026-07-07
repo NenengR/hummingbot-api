@@ -31,10 +31,10 @@ class DockerService:
 
         try:
             self.client = docker.from_env()
-            # Start background cleanup thread
             self._start_cleanup_thread()
         except DockerException as e:
-            logger.error(f"It was not possible to connect to Docker. Please make sure Docker is running. Error: {e}")
+            logger.warning(f"Docker not available, container management disabled: {e}")
+            self.client = None
 
     def get_active_containers(self, name_filter: str = None):
         try:

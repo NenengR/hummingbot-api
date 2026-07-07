@@ -28,7 +28,11 @@ class BotsOrchestrator:
         self.broker_password = broker_password
 
         # Initialize Docker client
-        self.docker_client = docker.from_env()
+        try:
+            self.docker_client = docker.from_env()
+        except Exception:
+            logger.warning("Docker not available, bot container management disabled")
+            self.docker_client = None
 
         # Initialize MQTT manager
         self.mqtt_manager = MQTTManager(host=broker_host, port=broker_port, username=broker_username, password=broker_password)

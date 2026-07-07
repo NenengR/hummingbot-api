@@ -30,8 +30,8 @@ class GatewayService:
         try:
             self.client = docker.from_env()
         except DockerException as e:
-            logger.error(f"Failed to connect to Docker. Error: {e}")
-            raise
+            logger.warning(f"Docker not available, Gateway management disabled: {e}")
+            self.client = None
 
     def _ensure_gateway_directories(self):
         """Create necessary directories for Gateway if they don't exist"""
