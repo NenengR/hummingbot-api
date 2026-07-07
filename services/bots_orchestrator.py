@@ -68,6 +68,8 @@ class BotsOrchestrator:
         return await loop.run_in_executor(None, self._sync_get_active_containers)
 
     def _sync_get_active_containers(self):
+        if not self.docker_client:
+            return []
         return [
             container.name
             for container in self.docker_client.containers.list()
