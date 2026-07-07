@@ -41,11 +41,13 @@ COPY utils ./utils
 COPY database ./database
 COPY bots/controllers ./bots/controllers
 COPY bots/scripts ./bots/scripts
-COPY bots/credentials ./bots/credentials
-COPY bots/conf ./bots/conf
 
 # Create necessary directories
-RUN mkdir -p bots/instances bots/data bots/archived
+RUN mkdir -p bots/instances bots/conf bots/credentials bots/data bots/archived
+
+# Copy entrypoint script
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 # Expose port
 EXPOSE 8000
@@ -55,4 +57,4 @@ ENV PATH="/opt/conda/envs/hummingbot-api/bin:$PATH"
 ENV CONDA_DEFAULT_ENV=hummingbot-api
 
 # Run the application
-ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["./entrypoint.sh"]
