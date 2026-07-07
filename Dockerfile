@@ -41,9 +41,11 @@ COPY utils ./utils
 COPY database ./database
 COPY bots/controllers ./bots/controllers
 COPY bots/scripts ./bots/scripts
+COPY bots/credentials ./bots/credentials
+COPY bots/conf ./bots/conf
 
 # Create necessary directories
-RUN mkdir -p bots/instances bots/conf bots/credentials bots/data bots/archived
+RUN mkdir -p bots/instances bots/data bots/archived
 
 # Expose port
 EXPOSE 8000
