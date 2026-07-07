@@ -235,7 +235,11 @@ async def lifespan(app: FastAPI):
     )
 
     backtesting_service = BacktestingService()
-    docker_service = DockerService()
+    try:
+        docker_service = DockerService()
+    except Exception as e:
+        logging.warning(f"Docker not available, running without Docker support: {e}")
+        docker_service = None
     gateway_service = GatewayService()
     bot_archiver = BotArchiver(
         settings.aws.api_key,
@@ -306,7 +310,8 @@ async def lifespan(app: FastAPI):
     await executor_service.stop()
     market_data_service.stop()
     await connector_service.stop_all()
-    docker_service.cleanup()
+    if docker_service:
+        docker_service.cleanup()
     await db_manager.close()
 
     logging.info("All services stopped")
