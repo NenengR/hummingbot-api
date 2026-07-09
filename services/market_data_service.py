@@ -396,6 +396,10 @@ class MarketDataService:
             max_records=10,
         ))
         try:
+            # Perpetual connectors need exchange data initialized (e.g. quanto_multiplier)
+            # before fetch_candles can parse the response correctly.
+            if hasattr(feed, 'initialize_exchange_data'):
+                await feed.initialize_exchange_data()
             end_time = int(_time.time())
             candles = await feed.fetch_candles(end_time=end_time, limit=1)
             if candles is None or len(candles) == 0:
@@ -432,9 +436,18 @@ class MarketDataService:
             feed = CandlesFactory.get_candle(config)
             feed.start()
             self._candle_feeds[feed_key] = feed
+            self._ensure_exchange_data_initialized(feed)
             logger.info(f"Created candle feed: {feed_key}")
 
         return self._candle_feeds[feed_key]
+
+    @staticmethod
+    def _ensure_exchange_data_initialized(feed) -> None:
+        """Schedule initialize_exchange_data for perpetual feeds that need it."""
+        import asyncio
+        if hasattr(feed, 'initialize_exchange_data') and hasattr(feed, 'quanto_multiplier'):
+            if feed.quanto_multiplier is None:
+                asyncio.ensure_future(feed.initialize_exchange_data())
 
     def get_candles_df(
             self,
